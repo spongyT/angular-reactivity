@@ -1,11 +1,12 @@
 <div class="p-3">
   <div class="flex row space-between">
-    <h2>{{ title }}</h2>
+    <h2>{{ title() }}</h2>
     <button mat-icon-button (click)="reload()">
       <mat-icon>sync</mat-icon>
     </button>
   </div>
 
+  @let user = userResource.hasValue() ? userResource.value() : undefined;
   @if (user !== undefined) {
     <form [formGroup]="form" (submit)="onSubmitClicked()">
       <div class="form">
@@ -53,10 +54,8 @@
       </button>
     </form>
     <div></div>
-  }
-
-  @if (error !== undefined) {
+  } @else if (userResource.error() !== undefined) {
     <h2>Leider ist ein Fehler aufgetreten!</h2>
-    <div>{{ error | json }}</div>
+    <div>{{ userResource.error() | json }}</div>
   }
 </div>

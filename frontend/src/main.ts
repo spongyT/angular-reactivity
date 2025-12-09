@@ -12,7 +12,7 @@ import {
 import { bootstrapApplication } from "@angular/platform-browser";
 import { provideTranslateService } from "@ngx-translate/core";
 import { APP_ROUTES } from "@app/app-routing.module";
-import { provideRouter } from "@angular/router";
+import { provideRouter, withComponentInputBinding } from "@angular/router";
 
 if (environment.production) {
   enableProdMode();
@@ -22,7 +22,7 @@ bootstrapApplication(AppComponent, {
   providers: [
     provideHttpClient(withInterceptorsFromDi()),
     provideAnimations(),
-    provideRouter(APP_ROUTES),
+    provideRouter(APP_ROUTES, withComponentInputBinding()),
     provideTranslateService({ useDefaultLang: false }),
   ],
 })

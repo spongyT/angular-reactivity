@@ -1,6 +1,13 @@
-import { Component, inject, OnInit } from "@angular/core";
-import { User, UserService } from "@app/modules/user/user.service";
-import { ActivatedRoute } from "@angular/router";
+import {
+  Component,
+  effect,
+  inject,
+  input,
+  numberAttribute,
+  Resource,
+  Signal,
+} from "@angular/core";
+import { User } from "@app/modules/user/user.service";
 import { JsonPipe } from "@angular/common";
 import { MatError, MatFormField, MatLabel } from "@angular/material/form-field";
 import {
@@ -12,6 +19,7 @@ import {
 import { MatInput } from "@angular/material/input";
 import { MatButton, MatIconButton } from "@angular/material/button";
 import { MatIcon } from "@angular/material/icon";
+import { UserDetailStore } from "@app/modules/user/user-detail/user-detail.store";
 
 @Component({
   selector: "app-user-detail",
@@ -28,26 +36,36 @@ import { MatIcon } from "@angular/material/icon";
   ],
   templateUrl: "./user-detail.component.html",
   styleUrl: "./user-detail.component.scss",
+  providers: [UserDetailStore],
 })
-export class UserDetailComponent implements OnInit {
-  private readonly userService = inject(UserService);
-  private readonly activatedRoute = inject(ActivatedRoute);
+export class UserDetailComponent {
   private readonly fb = inject(NonNullableFormBuilder);
+  private readonly userDetailStore = inject(UserDetailStore);
 
-  title: string = "Benutzerdaten werden geladen";
-  user: User | undefined;
-  isLoading: boolean = false;
-  error: Object | undefined;
-  form: FormGroup<UserForm> = this.createFormGroup();
-  userId!: number;
+  readonly form: FormGroup<UserForm> = this.createFormGroup();
 
-  ngOnInit(): void {
-    this.userId = this.activatedRoute.snapshot.params["userId"] as number;
-    this.loadUser();
+  readonly title: Signal<string> = this.userDetailStore.title;
+  readonly userId: Signal<number> = input.required({
+    transform: numberAttribute,
+  });
+  readonly userResource: Resource<User | undefined> =
+    this.userDetailStore.userResource;
+
+  constructor() {
+    this.userDetailStore.updateUserId(this.userId);
+    effect(() => {
+      if (this.userResource.hasValue()) {
+        this.form.setValue({
+          firstName: this.userResource.value().firstName,
+          lastName: this.userResource.value().lastName,
+        });
+        this.form.markAsPristine();
+      }
+    });
   }
 
   reload(): void {
-    this.loadUser();
+    this.userDetailStore.reload();
   }
 
   onSubmitClicked(): void {
@@ -58,40 +76,17 @@ export class UserDetailComponent implements OnInit {
     this.saveFormData();
   }
 
-  private loadUser() {
-    this.title = "Benutzerdaten werden geladen";
-    this.userService.getUserById(this.userId).subscribe({
-      next: (response) => {
-        this.title = `Benutzer: ${response.firstName} ${response.lastName}`;
-        this.isLoading = false;
-        this.user = response;
-        this.form.setValue({
-          firstName: response.firstName,
-          lastName: response.lastName,
-        });
-      },
-      error: (err) => {
-        this.title = `Fehler beim Laden des Benutzers`;
-        this.isLoading = false;
-        this.error = err;
-      },
-    });
-  }
-
   private createFormGroup(): FormGroup<UserForm> {
     return this.fb.group({ firstName: "", lastName: "" });
   }
 
   private saveFormData() {
-    this.userService
-      .updateUser(this.userId, this.form.getRawValue())
-      .subscribe({
-        next: () => {
-          this.form.markAsPristine();
-          this.loadUser();
-        },
-        error: (err) => console.error,
-      });
+    this.userDetailStore.updateUser(this.form.getRawValue()).subscribe({
+      next: () => {
+        this.form.markAsPristine();
+      },
+      error: console.error,
+    });
   }
 }
 

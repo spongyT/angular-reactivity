@@ -20,6 +20,7 @@
     "translations:check": "cpx --clean './src/translations/*' ./tmp/translations -v && npm run translations:extract && git diff --no-index --ignore-all-space --exit-code --color ./tmp/translations ./src/translations"
   },
   "dependencies": {
+    "@angular-architects/ngrx-toolkit": "^20.5.0",
     "@angular/animations": "^20.0.2",
     "@angular/cdk": "^20.0.0",
     "@angular/common": "^20.3.2",
@@ -31,6 +32,7 @@
     "@angular/platform-browser-dynamic": "^20.3.9",
     "@angular/router": "^20.3.9",
     "@biesbjerg/ngx-translate-extract-marker": "^1.0.0",
+    "@ngrx/signals": "^20.1.0",
     "@ngx-translate/core": "^16.0.4",
     "eslint": "^8.57.1",
     "ng-mocks": "^14.14.0",
