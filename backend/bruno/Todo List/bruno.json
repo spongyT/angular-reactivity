@@ -1,9 +1,0 @@
-{
-  "version": "1",
-  "name": "Quiz Server Backend",
-  "type": "collection",
-  "ignore": [
-    "node_modules",
-    ".git"
-  ]
-}

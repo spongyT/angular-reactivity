@@ -1,270 +1,185 @@
-import express from "express";
-import STORE, { QuestionItemInputZod, QuestionItemZod } from "./state.js";
+import express, {Request, Response} from "express";
+import swaggerUi from "swagger-ui-express";
+import swaggerJSDoc from "swagger-jsdoc";
 import cors from "cors";
-import { randomUUID } from "node:crypto";
-import { GameSession } from "./game.js";
-import { z } from "zod";
-const port = Number(process.env["PORT"] ?? 8080);
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-await STORE.populateWithExampleDataIfEmpty();
+// Swagger-Konfiguration
+const swaggerOptions = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "User CRUD API",
+      version: "1.0.0",
+      description: "Eine simple CRUD REST API für Nutzer"
+    }
+  },
+  apis: ["./src/index.ts"]
+};
 
-const SESSIONS: Record<string, GameSession> = {};
+const swaggerSpec = swaggerJSDoc(swaggerOptions);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.get("/questions", async (req, res) => {
-  const data = await STORE.getQuestions();
-  res.json(data);
+// Nutzer-Typ
+interface User {
+  id: number;
+  firstName: string;
+  lastName: string;
+}
+
+// In-Memory Datenbank
+let users: User[] = [
+  {id: 1, firstName: "John", lastName: "Doe",},
+  {id: 2, firstName: "Emma", lastName: "Miller",},
+  {id: 3, firstName: "Liam", lastName: "Brown",},
+  {id: 4, firstName: "Olivia", lastName: "Wilson",},
+  {id: 5, firstName: "Noah", lastName: "Taylor",},
+  {id: 6, firstName: "Ava", lastName: "Anderson",},
+  {id: 7, firstName: "James", lastName: "Thomas",},
+  {id: 8, firstName: "Sophia", lastName: "Jackson",},
+  {id: 9, firstName: "Lucas", lastName: "White",},
+  {id: 10, firstName: "Mia", lastName: "Harris",}
+];
+let nextId = 1;
+
+/**
+ * @openapi
+ * /users:
+ *   post:
+ *     summary: Legt einen neuen User an
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - firstName
+ *               - name
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: User erstellt
+ */
+app.post("/users", (req: Request, res: Response) => {
+  const {firstName, lastName} = req.body;
+  const newUser = {id: nextId++, firstName, lastName};
+  users.push(newUser);
+  res.status(201).json(newUser);
 });
 
-app.post("/questions/reset", async (req, res) => {
-  const data = await STORE.populateWithExampleDataIfEmpty(true);
-  res.json(data);
+/**
+ * @openapi
+ * /users:
+ *   get:
+ *     summary: Gibt alle User zurück
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: Liste aller User
+ */
+app.get("/users", (req: Request, res: Response) => {
+  res.json(users);
 });
 
-app.delete("/questions/:id", async (req, res) => {
-  const data = await STORE.deleteQuestion(req.params.id);
-  res.json({ deleted: data });
+/**
+ * @openapi
+ * /users/{id}:
+ *   get:
+ *     summary: Gibt einen einzelnen User zurück
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Gefundener User
+ *       404:
+ *         description: User nicht gefunden
+ */
+app.get("/users/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const user = users.find((u) => u.id === id);
+  if (!user) return res.status(404).json({message: "User not found"});
+  res.json(user);
 });
 
-app.get("/questions/:id", async (req, res) => {
-  const data = await STORE.getQuestion(req.params.id);
-  if (!data) {
-    res.status(404).json({ message: "Not found" });
-    return;
-  }
-  res.json(data);
+/**
+ * @openapi
+ * /users/{id}:
+ *   put:
+ *     summary: Aktualisiert einen User
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: User aktualisiert
+ *       404:
+ *         description: User nicht gefunden
+ */
+app.put("/users/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const {firstName, lastName} = req.body;
+
+  const user = users.find((u) => u.id === id);
+  if (!user) return res.status(404).json({message: "User not found"});
+
+  user.firstName = firstName ?? user.firstName;
+  user.lastName = lastName ?? user.lastName;
+
+  res.json(user);
 });
 
-app.post("/questions", async (req, res) => {
-  const payload = QuestionItemInputZod.safeParse(req.body);
-  if (!payload.success) {
-    res.status(400).json({
-      message: "Failed to parse request payload",
-      error: payload.error,
-    });
-    return;
-  }
-  const item = {
-    ...payload.data,
-    id: randomUUID(),
-    options: payload.data.options.map((e) => ({ ...e, id: randomUUID() })),
-  };
-  await STORE.putItem(item);
-
-  res.status(201).json(item);
+/**
+ * @openapi
+ * /users/{id}:
+ *   delete:
+ *     summary: Löscht einen User
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       204:
+ *         description: User gelöscht
+ */
+app.delete("/users/:id", (req, res) => {
+  const id = Number(req.params.id);
+  users = users.filter((u) => u.id !== id);
+  res.status(204).send();
 });
 
-app.get("/games", async (req, res) => {
-  const response = Object.values(SESSIONS).map((e) => e.publicState);
-  res.json(response);
+process.on("SIGINT", () => {
+  console.log("SIGINT empfangen, beende Server…");
+  process.exit(0);
 });
 
-app.get("/games/:id", async (req, res) => {
-  const game = SESSIONS[req.params.id];
-  if (!game) {
-    res.status(404).json({
-      message: "Game not found",
-    });
-    return;
-  }
-  res.json(game.publicState);
-});
-
-app.delete("/games/:id", async (req, res) => {
-  const game = SESSIONS[req.params.id];
-  if (game) {
-    game.notifyDestroy();
-    delete SESSIONS[req.params.id];
-  }
-  res.json({});
-});
-
-app.post("/games/:id/join", async (req, res) => {
-  const game = SESSIONS[req.params.id];
-  if (!game) {
-    res.status(404).json({
-      message: "Game not found",
-    });
-    return;
-  }
-  const payload = z
-    .object({ name: z.string().min(1).max(32) })
-    .safeParse(req.body);
-  if (!payload.success) {
-    res.status(400).json({
-      message: "Failed to parse request payload",
-      error: payload.error,
-    });
-    return;
-  }
-
-  const player = {
-    id: randomUUID(),
-    name: payload.data.name,
-    score: 0,
-    token: randomUUID(),
-  };
-  try {
-    game.addPlayer(player);
-  } catch (e) {
-    res.status(400).json({
-      message: "Failed to add player",
-      error: e + "",
-    });
-    return;
-  }
-  res.status(201).json(player);
-});
-
-app.post("/games/:id/leave", async (req, res) => {
-  const game = SESSIONS[req.params.id];
-  if (!game) {
-    res.status(404).json({
-      message: "Game not found",
-    });
-    return;
-  }
-  const authHeader = req.headers["authorization"];
-
-  if (
-    !authHeader ||
-    authHeader.split(" ").length != 2 ||
-    authHeader.split(" ")[0] !== "Bearer"
-  ) {
-    res.status(401).json({
-      error:
-        "Authorization header missing. When joining a game, use the token and set it as Bearer Token. E.g. 'Authorization: Bearer *************'",
-    });
-    return;
-  }
-  const token = authHeader.split(" ")[1];
-
-  res.json({ left: game.leavePlayer(token) });
-});
-
-app.post("/games/:id/start", async (req, res) => {
-  const game = SESSIONS[req.params.id];
-  if (!game) {
-    res.status(404).json({
-      message: "Game not found",
-    });
-    return;
-  }
-  try {
-    await game.startGame();
-  } catch (err) {
-    res.status(400).json({
-      message: "Failed to start game",
-    });
-    return;
-  }
-  res.json(game.publicState);
-});
-
-app.post("/games/:id/submitAnswer", async (req, res) => {
-  const authHeader = req.headers["authorization"];
-
-  if (
-    !authHeader ||
-    authHeader.split(" ").length != 2 ||
-    authHeader.split(" ")[0] !== "Bearer"
-  ) {
-    res.status(401).json({
-      error:
-        "Authorization header missing. When joining a game, use the token and set it as Bearer Token. E.g. 'Authorization: Bearer *************'",
-    });
-    return;
-  }
-  const token = authHeader.split(" ")[1];
-
-  const game = SESSIONS[req.params.id];
-  if (!game) {
-    res.status(404).json({
-      message: "Game not found",
-    });
-    return;
-  }
-  const payload = z
-    .object({ selectedOptionId: z.string().uuid() })
-    .safeParse(req.body);
-  if (!payload.success) {
-    res.status(400).json({
-      message: "Failed to parse request payload",
-      error: payload.error,
-    });
-    return;
-  }
-
-  try {
-    game.postAnswer(token, payload.data.selectedOptionId);
-  } catch (err) {
-    res.status(400).json({
-      message: "Failed to post answer",
-      error: err + "",
-    });
-    return;
-  }
-  res.json(game.publicState);
-});
-
-app.get("/games/:id/sse", async (req, res) => {
-  const game = SESSIONS[req.params.id];
-  if (!game) {
-    res.status(404).json({
-      message: "Game not found",
-    });
-    return;
-  }
-  res.set({
-    "Cache-Control": "no-cache",
-    "Content-Type": "text/event-stream",
-    Connection: "keep-alive",
-  });
-  res.flushHeaders();
-
-  res.write("retry: 10000\n\n");
-  res.write(`data: ${JSON.stringify(game.publicState)}\n\n`);
-
-  const listenerFn = (data: any) => {
-    const payload = JSON.stringify(data);
-    res.write(`data: ${payload}\n\n`);
-  };
-  game.emitter.addListener("event", listenerFn);
-  console.log("sub'd listener for game " + game.id);
-
-  req.on("close", () => {
-    game.emitter.removeListener("event", listenerFn);
-    console.log("unsub'd listener for game " + game.id);
-  });
-});
-
-app.post("/games", async (req, res) => {
-  const payload = z
-    .object({
-      timeToAnswerSeconds: z.number().int().positive().max(120),
-      questions: z.number().int().max(20),
-    })
-    .safeParse(req.body);
-  if (!payload.success) {
-    res.status(400).json({
-      message: "Failed to parse request payload",
-      error: payload.error,
-    });
-    return;
-  }
-
-  const game = new GameSession(
-    payload.data.questions,
-    payload.data.timeToAnswerSeconds
-  );
-  SESSIONS[game.id] = game;
-
-  res.status(201).json(game.publicState);
-});
-
-app.listen(port, () => {
-  console.log(":" + port);
+/* ========== SERVER START ========== */
+app.listen(3000, () => {
+  console.log("Server läuft: http://localhost:3000");
+  console.log("Swagger UI: http://localhost:3000/api-docs");
 });

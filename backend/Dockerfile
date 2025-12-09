@@ -1,24 +1,37 @@
-# Step 1: Build
+# ---- Build Stage ----
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# package.json + package-lock.json kopieren
 COPY package*.json ./
+
+# Dependencies installieren
+RUN npm install
+
+# Restlicher Code
 COPY tsconfig.json ./
-COPY tsup.config.ts ./
 COPY src ./src
 
-RUN npm install
+# TypeScript build
 RUN npm run build
 
-# Step 2: Run
+
+
+# ---- Runtime Stage ----
 FROM node:20-alpine
 
 WORKDIR /app
 
-COPY --from=builder /app/dist ./dist
+# Nur benötigte Dateien kopieren
 COPY package*.json ./
-RUN npm install --omit=dev
+RUN npm install --only=production
 
-EXPOSE 8080
+# Dist aus dem Builder kopieren
+COPY --from=builder /app/dist ./dist
+
+# Expose Port
+EXPOSE 3000
+
+# Startbefehl
 CMD ["node", "dist/index.js"]
