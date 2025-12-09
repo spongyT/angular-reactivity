@@ -7,7 +7,7 @@ import {
   FormControl,
   FormGroup,
   NonNullableFormBuilder,
-  ReactiveFormsModule
+  ReactiveFormsModule,
 } from "@angular/forms";
 import { MatInput } from "@angular/material/input";
 import { MatSnackBar } from "@angular/material/snack-bar";
