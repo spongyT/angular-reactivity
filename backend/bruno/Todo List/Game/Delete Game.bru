@@ -1,0 +1,11 @@
+meta {
+  name: Delete Game
+  type: http
+  seq: 8
+}
+
+delete {
+  url: {{HOST}}/games/{{GAME_ID}}
+  body: none
+  auth: inherit
+}

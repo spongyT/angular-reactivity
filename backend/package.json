@@ -1,0 +1,27 @@
+{
+  "name": "todo-list-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsup-node src/index.ts",
+    "dev": "tsup-node src/index.ts --watch --onSuccess 'node dist/index.js'"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/cors": "^2.8.18",
+    "@types/express": "^5.0.2",
+    "@types/node": "^22.15.31",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "async-mutex": "^0.5.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "zod": "^3.25.51"
+  }
+}

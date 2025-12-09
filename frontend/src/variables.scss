@@ -1,0 +1,15 @@
+$spacer: 16px !default;
+$spacer0: 0;
+$spacer1: $spacer * 0.25;
+$spacer2: $spacer * 0.5; // small gaps between same level view elements
+$spacer3: $spacer; // bigger gaps (hierarchies)
+$spacer4: $spacer * 1.5;
+$spacer5: $spacer * 3;
+$spacers: (
+  0: $spacer0,
+  1: $spacer1,
+  2: $spacer2,
+  3: $spacer3,
+  4: $spacer4,
+  5: $spacer5,
+) !default;

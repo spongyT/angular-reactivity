@@ -1,0 +1,6 @@
+<p>user-list works!</p>
+
+@for (user of users; track user.id) {
+  <button mat-flat-button (click)="navigateToUser(user)">{{ user.id }}</button>
+}
+{{ users.length }}

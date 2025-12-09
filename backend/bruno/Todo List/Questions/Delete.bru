@@ -1,0 +1,11 @@
+meta {
+  name: Delete
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{HOST}}/questions/{{QUESTION_ID}}
+  body: none
+  auth: inherit
+}

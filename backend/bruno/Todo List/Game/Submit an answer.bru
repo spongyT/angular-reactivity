@@ -1,0 +1,19 @@
+meta {
+  name: Submit an answer
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{HOST}}/games/{{GAME_ID}}/submitAnswer
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{PLAYER_TOKEN}}
+}
+
+body:json {
+  {"selectedOptionId": "d2c3f6ec-5f24-44c5-8f67-ede79a348595"}
+}

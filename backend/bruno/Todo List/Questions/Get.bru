@@ -1,0 +1,11 @@
+meta {
+  name: Get
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{HOST}}/questions/{{QUESTION_ID}}
+  body: none
+  auth: inherit
+}

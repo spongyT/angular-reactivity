@@ -1,0 +1,17 @@
+mat-sidenav {
+  width: 288px; // 3 * base grid 96px
+  height: calc(100vh); // "over-height" to cover grey background with white
+}
+
+mat-sidenav-content {
+  padding-bottom: 12px;
+  padding-left: 24px;
+  padding-right: 24px;
+  height: calc(
+    100vh - 100px
+  ); // 100 := 76 (app bar + padding) + 2 * 12 padding (nav-content)
+}
+
+mat-sidenav-container {
+  height: calc(100vh - 76px); // 76 := 64 app-bar + 1 * 12 padding
+}

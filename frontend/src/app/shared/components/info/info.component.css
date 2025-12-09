@@ -1,0 +1,8 @@
+.wrapper {
+  border: solid 1px lightgrey;
+  border-radius: 5px;
+}
+
+mat-icon {
+  min-width: 24px;
+}

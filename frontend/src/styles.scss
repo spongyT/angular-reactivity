@@ -1,0 +1,153 @@
+@import "variables";
+@import "theme";
+
+html,
+body {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.fill-h {
+  height: 100%;
+}
+
+.fill-w {
+  width: 100%;
+}
+
+.fill {
+  height: 100%;
+  width: 100%;
+}
+
+.pos-absolute {
+  position: absolute;
+}
+
+.float-right {
+  float: right;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/** positions **/
+@each $prop, $abbrev in (bottom: b, top: t, left: l, right: r) {
+  @each $size, $length in $spacers {
+    .#{$abbrev}-#{$size} {
+      #{$prop}: $length !important;
+    }
+  }
+}
+
+/** Spacers, Paddings and Margins **/
+
+@each $prop, $abbrev in (margin: m, padding: p) {
+  @each $size, $length in $spacers {
+    .#{$abbrev}-#{$size} {
+      #{$prop}: $length !important;
+    }
+    .#{$abbrev}t-#{$size},
+    .#{$abbrev}y-#{$size} {
+      #{$prop}-top: $length !important;
+    }
+    .#{$abbrev}r-#{$size},
+    .#{$abbrev}x-#{$size} {
+      #{$prop}-right: $length !important;
+    }
+    .#{$abbrev}b-#{$size},
+    .#{$abbrev}y-#{$size} {
+      #{$prop}-bottom: $length !important;
+    }
+    .#{$abbrev}l-#{$size},
+    .#{$abbrev}x-#{$size} {
+      #{$prop}-left: $length !important;
+    }
+  }
+}
+
+.flex {
+  display: flex;
+}
+
+.flex.row {
+  flex-direction: row;
+}
+
+.flex.column {
+  flex-direction: column;
+}
+
+.flex.center {
+  align-items: center;
+  justify-content: center;
+  place-content: center;
+}
+
+.flex.wrap {
+  flex-wrap: wrap;
+}
+
+.flex.reverse-wrap {
+  flex-wrap: wrap-reverse;
+}
+
+.flex.space-between {
+  justify-content: space-between;
+}
+
+.flex.column {
+  flex-direction: column !important;
+}
+
+.flex.align-center {
+  align-items: center;
+}
+
+.flex.align-start {
+  align-items: start;
+}
+
+.flex.align-end {
+  align-items: end;
+}
+
+.flex.end {
+  justify-content: end;
+  justify-self: end;
+}
+
+.flex.justify-start {
+  justify-content: start;
+}
+
+.flex .grow {
+  flex-grow: 1;
+}
+
+/** View-Encapsulation **/
+
+.homer {
+  height: 200px;
+  width: 200px;
+  position: absolute;
+  top: 100px;
+  left: 100px;
+}
