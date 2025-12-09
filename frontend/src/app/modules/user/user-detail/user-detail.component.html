@@ -1,3 +1,59 @@
-<p>user-detail works!</p>
+<div class="p-3">
+  <div class="flex row space-between">
+    <h2>{{ title }}</h2>
+    <button mat-icon-button (click)="reload()">
+      <mat-icon>sync</mat-icon>
+    </button>
+  </div>
 
-{{ user | json }}
+  @if (user !== undefined) {
+    <form [formGroup]="form" (submit)="onSubmitClicked()">
+      <div class="form">
+        <mat-form-field class="col-6">
+          <mat-label>Vorname</mat-label>
+          <input
+            matInput
+            [formControl]="form.controls.firstName"
+            placeholder="Vorname"
+            autocomplete="off"
+            spellcheck="false"
+            type="text"
+            required
+          />
+          @if (form.controls.firstName.hasError("required")) {
+            <mat-error>Dies ist ein Pflichtfeld!</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Nachname</mat-label>
+          <input
+            matInput
+            [formControl]="form.controls.lastName"
+            placeholder="Nachname"
+            autocomplete="off"
+            spellcheck="false"
+            type="text"
+            required
+          />
+          @if (form.controls.lastName.hasError("required")) {
+            <mat-error>Dies ist ein Pflichtfeld!</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <button
+        mat-raised-button
+        color="primary"
+        class="ml-2"
+        [disabled]="!form.valid || form.pristine"
+      ><mat-icon>save</mat-icon>
+        Speichern
+      </button>
+    </form>
+    <div></div>
+  } @else {
+    <h2>Leider ist ein Fehler aufgetreten!</h2>
+    <div>{{ error | json }}</div>
+  }
+</div>

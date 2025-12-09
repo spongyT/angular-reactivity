@@ -14,13 +14,22 @@ export class UserService {
     return this.http.get<User[]>(`${this.userBaseUrl}/users`);
   }
 
-  getUserById(userid: number): Observable<User> {
-    return this.http.get<User>(`${this.userBaseUrl}/users/${userid}`);
+  getUserById(userId: number): Observable<User> {
+    return this.http.get<User>(`${this.userBaseUrl}/users/${userId}`);
+  }
+
+  updateUser(userId: number, update: UserUpdate) {
+    return this.http.put<void>(`${this.userBaseUrl}/users/${userId}`, update);
   }
 }
 
 export interface User {
   id: number;
+  firstName: string;
+  lastName: string;
+}
+
+export interface UserUpdate {
   firstName: string;
   lastName: string;
 }
