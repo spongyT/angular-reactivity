@@ -47,12 +47,15 @@
         color="primary"
         class="ml-2"
         [disabled]="!form.valid || form.pristine"
-      ><mat-icon>save</mat-icon>
+      >
+        <mat-icon>save</mat-icon>
         Speichern
       </button>
     </form>
     <div></div>
-  } @else {
+  }
+
+  @if (error !== undefined) {
     <h2>Leider ist ein Fehler aufgetreten!</h2>
     <div>{{ error | json }}</div>
   }

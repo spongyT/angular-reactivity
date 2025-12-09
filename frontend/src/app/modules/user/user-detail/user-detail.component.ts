@@ -10,7 +10,6 @@ import {
   ReactiveFormsModule,
 } from "@angular/forms";
 import { MatInput } from "@angular/material/input";
-import { MatSnackBar } from "@angular/material/snack-bar";
 import { MatButton, MatIconButton } from "@angular/material/button";
 import { MatIcon } from "@angular/material/icon";
 
@@ -34,12 +33,11 @@ export class UserDetailComponent implements OnInit {
   private readonly userService = inject(UserService);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly fb = inject(NonNullableFormBuilder);
-  private readonly matSnackBar = inject(MatSnackBar);
 
   title: string = "Benutzerdaten werden geladen";
   user: User | undefined;
   isLoading: boolean = false;
-  error: Object | undefined = false;
+  error: Object | undefined;
   form: FormGroup<UserForm> = this.createFormGroup();
   userId!: number;
 
@@ -90,14 +88,9 @@ export class UserDetailComponent implements OnInit {
       .subscribe({
         next: () => {
           this.form.markAsPristine();
-          this.matSnackBar.open("Erfolgreich gespeichert");
           this.loadUser();
         },
-        error: (err) => {
-          this.matSnackBar.open(
-            `Fehler beim speichern: ${JSON.stringify(err)}`,
-          );
-        },
+        error: (err) => console.error,
       });
   }
 }
