@@ -13,11 +13,6 @@ export class AppComponent {
     {
       title: "Benutzerverwaltung",
       path: "users",
-      // FIXME cleanup
-      // childrens: [
-      //   { title: "Benutzerübersicht", path: "users" },
-      //   { title: "Smart & Dumb Konzept 👍", path: "smart-dumb/with-concept" },
-      // ],
     },
   ];
 }
