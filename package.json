@@ -1,0 +1,13 @@
+{
+  "name": "angular-reactivity",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "install:all": "npm install --workspaces",
+    "start:backend": "npm --workspace backend start",
+    "start:frontend": "npm --workspace frontend start"
+  }
+}
