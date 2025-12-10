@@ -1,3 +1,0 @@
-# Angular Advanced Demo Projekt
-
-

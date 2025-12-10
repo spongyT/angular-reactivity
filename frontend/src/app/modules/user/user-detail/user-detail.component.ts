@@ -43,11 +43,11 @@ export class UserDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.userId = this.activatedRoute.snapshot.params["userId"] as number;
-    this.loadUser();
+    this.reloadUserFromBackend();
   }
 
   reload(): void {
-    this.loadUser();
+    this.reloadUserFromBackend();
   }
 
   onSubmitClicked(): void {
@@ -58,17 +58,14 @@ export class UserDetailComponent implements OnInit {
     this.saveFormData();
   }
 
-  private loadUser() {
+  private reloadUserFromBackend() {
     this.title = "Benutzerdaten werden geladen";
     this.userService.getUserById(this.userId).subscribe({
       next: (response) => {
         this.title = `Benutzer: ${response.firstName} ${response.lastName}`;
         this.isLoading = false;
         this.user = response;
-        this.form.setValue({
-          firstName: response.firstName,
-          lastName: response.lastName,
-        });
+        this.updateForm(response);
       },
       error: (err) => {
         this.title = `Fehler beim Laden des Benutzers`;
@@ -76,6 +73,14 @@ export class UserDetailComponent implements OnInit {
         this.error = err;
       },
     });
+  }
+
+  private updateForm(response: User) {
+    this.form.setValue({
+      firstName: response.firstName,
+      lastName: response.lastName,
+    });
+    this.form.markAsPristine();
   }
 
   private createFormGroup(): FormGroup<UserForm> {
@@ -88,12 +93,14 @@ export class UserDetailComponent implements OnInit {
       .subscribe({
         next: () => {
           this.form.markAsPristine();
-          this.loadUser();
+          this.reloadUserFromBackend();
         },
-        error: (err) => console.error,
+        error: console.error,
       });
   }
 }
+
+// Component models
 
 interface UserForm {
   firstName: FormControl<string>;
