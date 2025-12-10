@@ -11,7 +11,7 @@ import { NavigationComponent } from "./shared/components/navigation/navigation.c
 export class AppComponent {
   concepts: Navigation[] = [
     {
-      title: "Nutzer",
+      title: "Benutzerverwaltung",
       path: "users",
       // FIXME cleanup
       // childrens: [
